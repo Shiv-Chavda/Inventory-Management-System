@@ -91,37 +91,43 @@ app.use("/api/reports", reportsRouter);
 app.use(notFound);
 app.use(errorHandler);
 
-const port = Number(process.env.PORT || 4000);
+module.exports = app;
 
-async function start() {
-  logger.info("backend_starting", {
-    port,
-    nodeEnv: process.env.NODE_ENV || "development",
-    frontendOrigin: process.env.FRONTEND_ORIGIN
-  });
+// Local/dev entrypoint. On Vercel, this file is loaded as a serverless function,
+// so we must NOT start a long-running HTTP server.
+if (require.main === module) {
+  const port = Number(process.env.PORT || 4000);
 
-  await prisma.$connect();
-  logger.info("db_connected");
-
-  const server = app.listen(port, () => {
-    logger.info("backend_listening", { url: `http://localhost:${port}` });
-  });
-
-  const shutdown = async (signal) => {
-    logger.warn("backend_shutdown", { signal });
-    server.close(() => {
-      logger.info("http_server_closed");
+  async function start() {
+    logger.info("backend_starting", {
+      port,
+      nodeEnv: process.env.NODE_ENV || "development",
+      frontendOrigin: process.env.FRONTEND_ORIGIN
     });
-    await prisma.$disconnect();
-    logger.info("db_disconnected");
-  };
 
-  process.on("SIGINT", () => void shutdown("SIGINT"));
-  process.on("SIGTERM", () => void shutdown("SIGTERM"));
+    await prisma.$connect();
+    logger.info("db_connected");
+
+    const server = app.listen(port, () => {
+      logger.info("backend_listening", { url: `http://localhost:${port}` });
+    });
+
+    const shutdown = async (signal) => {
+      logger.warn("backend_shutdown", { signal });
+      server.close(() => {
+        logger.info("http_server_closed");
+      });
+      await prisma.$disconnect();
+      logger.info("db_disconnected");
+    };
+
+    process.on("SIGINT", () => void shutdown("SIGINT"));
+    process.on("SIGTERM", () => void shutdown("SIGTERM"));
+  }
+
+  start().catch((err) => {
+    const e = err instanceof Error ? err : new Error("Startup failed");
+    logger.error("fatal_startup_error", { message: e.message, stack: e.stack });
+    process.exitCode = 1;
+  });
 }
-
-start().catch((err) => {
-  const e = err instanceof Error ? err : new Error("Startup failed");
-  logger.error("fatal_startup_error", { message: e.message, stack: e.stack });
-  process.exitCode = 1;
-});

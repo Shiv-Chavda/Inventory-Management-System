@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "nodemon",
     "start": "node src/app.js",
+    "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
