@@ -46,6 +46,12 @@ npm run dev
 
 Frontend runs at `http://localhost:3000`.
 
+## Deploying to Vercel (frontend)
+
+- Deploy the frontend as a separate Vercel project with **Root Directory** set to `frontend`.
+- Set `NEXT_PUBLIC_API_BASE_URL` in the Vercel frontend project to your backend base URL (example: `https://<backend>.vercel.app`).
+- Ensure the backend allows the Vercel frontend origin via `FRONTEND_ORIGIN` (example: `https://<frontend>.vercel.app`).
+
 ## What this solves (assignment scope)
 
 This implementation provides **inventory visibility** per SKU and two practical controls:
