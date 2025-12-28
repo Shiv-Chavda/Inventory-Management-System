@@ -47,71 +47,97 @@ export default function ProductDetail({ id }: { id: string }) {
     return (
       <div className="card">
         <div className="muted">Loading…</div>
-        {error ? <p className="muted">{error}</p> : null}
+        {error ? <div className="alert" style={{ marginTop: 12 }}>{error}</div> : null}
       </div>
     );
   }
 
   return (
-    <div className="row">
-      <div className="card" style={{ flex: 1, minWidth: 320 }}>
-        <h2>{product.sku}</h2>
-        <div className="muted">{product.name}</div>
-        <p>
-          <b>On hand:</b> {product.onHand} {product.unit}
-        </p>
-        <p>
-          <b>Reorder level:</b> {product.reorderLevel}
-        </p>
-        <p className="muted">
-          <Link href="/products">← Back to products</Link>
-        </p>
-      </div>
+    <div>
+      <div className="pageTitle">{product.sku}</div>
+      <div className="pageSub">{product.name}</div>
 
-      <div className="card" style={{ flex: 1, minWidth: 320 }}>
-        <h2>Add Movement</h2>
-        <form onSubmit={addMovement} className="row">
-          <select value={type} onChange={(e) => setType(e.target.value as any)}>
-            <option value="IN">IN (purchase / received)</option>
-            <option value="OUT">OUT (sold / issued)</option>
-            <option value="DAMAGED">DAMAGED (write-off)</option>
-          </select>
-          <input value={quantity} onChange={(e) => setQuantity(e.target.value)} inputMode="numeric" />
-          <input placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
-          <button disabled={saving}>Save</button>
-        </form>
-        {error ? <p className="muted">{error}</p> : null}
-      </div>
+      {error ? <div className="alert">{error}</div> : null}
 
-      <div className="card" style={{ flexBasis: "100%" }}>
-        <h2>Recent Movements</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>When</th>
-              <th>Type</th>
-              <th>Qty</th>
-              <th>Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            {product.movements.map((m) => (
-              <tr key={m.id}>
-                <td className="muted">{new Date(m.createdAt).toLocaleString()}</td>
-                <td>{m.type}</td>
-                <td>{m.quantity}</td>
-                <td className="muted">{m.note ?? "—"}</td>
-              </tr>
-            ))}
-            {product.movements.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="muted">
-                  No movements yet
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
+      <div className="grid" style={{ marginTop: 12 }}>
+        <section className="card col-4">
+          <h2>Details</h2>
+          <div className="divider" />
+          <div className="row" style={{ alignItems: "center", justifyContent: "space-between" }}>
+            <span className="pill">On hand</span>
+            <span style={{ fontSize: 24, fontWeight: 850 }}>
+              {product.onHand} <span className="muted">{product.unit}</span>
+            </span>
+          </div>
+          <div className="divider" />
+          <div className="row" style={{ alignItems: "center", justifyContent: "space-between" }}>
+            <span className="pill">Reorder level</span>
+            <span style={{ fontSize: 18, fontWeight: 800 }}>{product.reorderLevel}</span>
+          </div>
+          <div className="divider" />
+          <Link className="link" href="/products">
+            ← Back to products
+          </Link>
+        </section>
+
+        <section className="card col-8">
+          <h2>Add Movement</h2>
+          <div className="muted">Record stock changes and keep history accurate</div>
+          <div className="divider" />
+          <form onSubmit={addMovement} className="formGrid">
+            <div className="field sm-4">
+              <div className="fieldLabel">Type</div>
+              <select value={type} onChange={(e) => setType(e.target.value as any)}>
+                <option value="IN">IN (purchase / received)</option>
+                <option value="OUT">OUT (sold / issued)</option>
+                <option value="DAMAGED">DAMAGED (write-off)</option>
+              </select>
+            </div>
+            <div className="field sm-4">
+              <div className="fieldLabel">Quantity</div>
+              <input value={quantity} onChange={(e) => setQuantity(e.target.value)} inputMode="numeric" />
+            </div>
+            <div className="field sm-4">
+              <div className="fieldLabel">Note</div>
+              <input placeholder="Optional" value={note} onChange={(e) => setNote(e.target.value)} />
+            </div>
+            <div className="field">
+              <button disabled={saving}>{saving ? "Saving…" : "Save movement"}</button>
+            </div>
+          </form>
+
+          <div className="divider" />
+          <h2>Recent Movements</h2>
+          <div className="tableWrap" style={{ marginTop: 10 }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Type</th>
+                  <th>Qty</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {product.movements.map((m) => (
+                  <tr key={m.id}>
+                    <td className="muted">{new Date(m.createdAt).toLocaleString()}</td>
+                    <td>{m.type}</td>
+                    <td>{m.quantity}</td>
+                    <td className="muted">{m.note ?? "—"}</td>
+                  </tr>
+                ))}
+                {product.movements.length === 0 ? (
+                  <tr>
+                    <td colSpan={4}>
+                      <div className="softNote">No movements yet. Add the first movement above.</div>
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </div>
   );

@@ -11,11 +11,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <div className="container">
-          <nav className="nav">
-            <Link href="/">Dashboard</Link>
-            <Link href="/products">Products</Link>
-          </nav>
-          {children}
+          <header className="topbar">
+            <div className="brand">
+              <div className="brandTitle">Inventory Management</div>
+              <div className="brandSub">Fast SKU visibility and stock movements</div>
+            </div>
+            <nav className="nav">
+              <Link href="/">Dashboard</Link>
+              <Link href="/products">Products</Link>
+            </nav>
+          </header>
+          <main>{children}</main>
         </div>
       </body>
     </html>
